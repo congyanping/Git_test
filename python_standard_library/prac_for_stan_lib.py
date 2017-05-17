@@ -32,6 +32,7 @@ for i in range(6,1,-1):
             time.clock())
     print 'Sleeping',i
     time.sleep(i)
+print "hello"
 a=1
 b=2
 c=3
