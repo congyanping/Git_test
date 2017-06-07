@@ -1,5 +1,4 @@
-# Suppose we want to mediate one dimension data(raw data is 3D)
-
+# Suppose we want to mediate one_dimensional data
 import numpy as np
 
 #def func(x, y):
@@ -8,45 +7,53 @@ import numpy as np
 # on a grid in [0, 1]x[0, 1]
 
 #grid_x, grid_y = np.mgrid[0:1:100j, 0:1:200j]
-import sys
+
 import matplotlib                                                             
 matplotlib.use('Agg')# but we only know its values at 1000 data points:
 import matplotlib.pyplot as plt
 import h5py
+import sys
 f= h5py.File(sys.argv[1],'r')
-try:
-    vis = f['vis'][70,:,2]
-except:
-    vis = f['vis'][66,:]
+vis = f['vis'][70,:,188]
 print "vis shape",vis.shape
+import scipy.signal as signal
+x = np.linspace(1,1008,1008)
+y = vis
+y_new = signal.medfit(y,5)
+
+file = np.zeros((150,1008))
+for i in range(file.shape[1]):
+    file[:,i]=ynew[i]
+g= h5py.File('20160928235342_20160929000342.hdf5_smooth.hdf5','w')
+g.create_dataset('vis',data=file)
+g.close()
+
+
+"""
 from scipy import interpolate
-x = np.linspace(600,800,1008)
-vis = np.abs(vis)
+x = np.linspace(1,1008,1008)
 y =list(vis)
-xnew = np.linspace(680,800,1008)
+xnew = np.linspace(1,1008,10080)
 print xnew.shape
-fig, ax = plt.subplots()
 plt.plot(x,y,'ro')
-ax.set_ylabel('Vis')
-ax.set_xlabel('Frequency')
-#for kind in ['nearest']:
-#    f = interpolate.interp1d(x,y,kind=kind)
-#    ynew =f(xnew)
-#    plt.plot(xnew,ynew,label=str(kind))
-    #g= h5py.File('20160928235342_20160929000342.hdf5_smooth.hdf5','w')
-    #print "line of ynew",len(ynew)
-    #file = np.zeros((150,10080))
-    #for i in range(file.shape[1]):
-    #    file[:,i] = ynew[i]
+for kind in ['nearest']:
+    f = interpolate.interp1d(x,y,kind=kind)
+    ynew =f(xnew)
+    plt.plot(xnew,ynew,label=str(kind))
+    g= h5py.File('20160928235342_20160929000342.hdf5_smooth.hdf5','w')
+    print "line of ynew",len(ynew)
+    file = np.zeros((150,10080))
+    for i in range(file.shape[1]):
+        file[:,i] = ynew[i]
         #print ynew[i]
     #print [j for j in file[2,:] if j >0]
-    #file = file[:,0:10080:10]
-    #print "file shape is", file.shape
-    #g.create_dataset('vis',data=file)
-    #g.close()
+    file = file[:,0:10080:10]
+    print "file shape is", file.shape
+    g.create_dataset('vis',data=file)
+    g.close()
 plt.legend(loc='lower right')
 plt.savefig("new_picture")
-
+"""
 
 
 
