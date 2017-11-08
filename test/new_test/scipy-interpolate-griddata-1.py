@@ -1,31 +1,36 @@
-# Suppose we want to mediate one_dimensional data
+# Suppose we want to interpolate the 2-D function
 import numpy as np
+
+#def func(x, y):
+#    return x*(1-x)*np.cos(4*np.pi*x) * np.sin(4*np.pi*y**2)**2
+
+# on a grid in [0, 1]x[0, 1]
+
+#grid_x, grid_y = np.mgrid[0:1:100j, 0:1:200j]
+
+import matplotlib                                                             
 matplotlib.use('Agg')# but we only know its values at 1000 data points:
 import matplotlib.pyplot as plt
 import h5py
 import sys
 f= h5py.File(sys.argv[1],'r')
-shape=f['vis'].shape
-for baseline in xrange(shape[2]):
-    vis = f['vis'][:,:,baseline+1]
-    result = signal.medfilt2d(vis,5)
-    f['vis'][:,:,baseline+1]=result
+vis=[]
+for i in range(1008):
+    vi = np.sum(np.abs(f['vis'][48:66,i]))/18.0
+    vis.append(vi)
+print "vis shape",len(vis)
+import scipy.signal as signal
+x = np.linspace(1,1008,1008)
+y = vis
+y_new = signal.medfilt(y,5)
+print "y_new type",type(y_new)
+file = np.zeros((150,1008))
+for i in range(file.shape[1]):
+    file[:,i]=y_new[i]
+g= h5py.File('20160928235342_20160929000342.hdf5_smooth.hdf5','w')
+g.create_dataset('vis',data=file)
+g.close()
 
-f.close()
-#vis = f['vis'][70,:,188]
-#print "vis shape",vis.shape
-#import scipy.signal as signal
-#x = np.linspace(1,1008,1008)
-#y = vis
-#y_new = signal.medfit(y,5)
-#
-#file = np.zeros((150,1008))
-#for i in range(file.shape[1]):
-#    file[:,i]=ynew[i]
-#g= h5py.File('20160928235342_20160929000342.hdf5_smooth.hdf5','w')
-#g.create_dataset('vis',data=file)
-#g.close()
-#
 
 """
 from scipy import interpolate
